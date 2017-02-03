@@ -7,9 +7,18 @@
 //
 
 #include <iostream>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
-int main(int argc, const char * argv[]) {
-    // insert code here...
-    std::cout << "Hello, World!\n";
+using namespace cv;
+
+int main(){
+    Mat image = imread("/Users/PinYo/Documents/workspace/OpenCV_Practice/OpenCV_Practice/123.png");
+    namedWindow("Image");
+    if(image.empty())
+        std::cout << "123";
+    else
+        imshow("Image", image);
+    waitKey();
     return 0;
 }
