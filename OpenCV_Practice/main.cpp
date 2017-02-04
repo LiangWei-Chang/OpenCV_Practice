@@ -18,6 +18,7 @@ int slider_value, max_slider_value;
 Mat frame, frame_front, frame_front_gray;
 Mat canny_dst, detected_edges;
 VideoCapture front_cam(0);
+VideoCapture video("/Users/PinYo/Desktop/Senior_Preject/OpenCV_Project/OpenCV_Practice/OpenCV_Practice/TenThousandSad.mp4");
 
 int edgeThresh = 1;
 int Ratio = 3;
@@ -34,11 +35,15 @@ void CannyThreshold(int, void*){
 }
 
 void on_trackbar(int, void*){
+    video >> frame;
     front_cam >> frame_front;
     double alpha = (double)slider_value / 100.0;
     double beta = 1.0 - alpha;
     
-    resize(frame_front, frame_front, Size(frame_front.cols/2, frame_front.rows/2));
+    // resize the frame to fit the monitor
+    resize(frame, frame, Size(frame.cols*0.9, frame.rows*0.9));
+    resize(frame_front, frame_front, Size(frame_front.cols*0.2, frame_front.rows*0.2));
+    
     /// Create a matrix of the same type and size as src (for dst)
     canny_dst.create(frame_front.size(), frame_front.type());
     
@@ -57,12 +62,13 @@ void on_trackbar(int, void*){
     Mat blended;
     
     addWeighted(canny_dst, alpha, frame_front, beta, 0.0, blended);
-    imshow("Video Window", blended);
+    
+    // Copy blended front_frame to the video frame
+    blended.copyTo(frame(Rect(0, 0, blended.cols, blended.rows)));
+    imshow("Video Window", frame);
 }
 
 int main(){
-    //VideoCapture front_cam(0);
-    VideoCapture video("/Users/PinYo/Desktop/Senior_Preject/OpenCV_Project/OpenCV_Practice/OpenCV_Practice/TenThousandSad.mp4");
     if(!front_cam.isOpened()){
         cout << "Front camera loading error\n";
         return -1;
@@ -81,10 +87,8 @@ int main(){
     on_trackbar(slider_value, 0);
     for(;;){
         on_trackbar(slider_value, 0);
-        //resize(frame_front, frame_front, Size(frame_front.cols/4, frame_front.rows/4));
-        //imshow("Video Window", frame_front);
-        //imshow("Video Window", frame);
-        if(waitKey(30) < 0) break;
+        
+        if(waitKey(1) < 0) break;
     }
     return 0;
 }
