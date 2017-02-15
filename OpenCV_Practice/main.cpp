@@ -17,32 +17,15 @@ using namespace std;
 int slider_value, max_slider_value;
 Mat frame, frame_front, frame_front_gray;
 Mat canny_dst, detected_edges;
-VideoCapture front_cam(0);
-VideoCapture video("/Users/PinYo/Desktop/Senior_Preject/OpenCV_Project/OpenCV_Practice/OpenCV_Practice/TenThousandSad.mp4");
 
 int edgeThresh = 1;
 int Ratio = 3;
 int kernel_size = 3;
 
-void CannyThreshold(int, void*){
-    // Reduce noise with a kernel 3x3
-    blur(frame_front, detected_edges, Size(3, 3));
-    // Canny detector
-    Canny(detected_edges, detected_edges, slider_value, slider_value*Ratio, kernel_size);
-    
-    canny_dst = Scalar::all(0);
-    frame_front.copyTo(canny_dst, detected_edges);
-}
-
 void on_trackbar(int, void*){
-    video >> frame;
-    front_cam >> frame_front;
+    
     double alpha = (double)slider_value / 100.0;
     double beta = 1.0 - alpha;
-    
-    // resize the frame to fit the monitor
-    resize(frame, frame, Size(frame.cols*0.9, frame.rows*0.9));
-    resize(frame_front, frame_front, Size(frame_front.cols*0.2, frame_front.rows*0.2));
     
     /// Create a matrix of the same type and size as src (for dst)
     canny_dst.create(frame_front.size(), frame_front.type());
@@ -69,6 +52,9 @@ void on_trackbar(int, void*){
 }
 
 int main(){
+    VideoCapture front_cam(0);
+    VideoCapture video("/Users/PinYo/Desktop/Senior_Preject/OpenCV_Project/OpenCV_Practice/OpenCV_Practice/TenThousandSad.mp4");
+    
     if(!front_cam.isOpened()){
         cout << "Front camera loading error\n";
         return -1;
@@ -81,13 +67,18 @@ int main(){
     slider_value = 0;
     max_slider_value = 100;
     
-    Mat edges;
     namedWindow("Video Window", CV_WINDOW_KEEPRATIO);
     createTrackbar("Ratio: ", "Video Window", &slider_value, max_slider_value, on_trackbar);
-    on_trackbar(slider_value, 0);
+    
     for(;;){
-        on_trackbar(slider_value, 0);
+        video >> frame;
+        front_cam >> frame_front;
+        // resize the frame to fit the monitor
+        resize(frame, frame, Size(frame.cols*0.9, frame.rows*0.9));
+        resize(frame_front, frame_front, Size(frame_front.cols*0.2, frame_front.rows*0.2));
         
+        on_trackbar(slider_value, 0);
+
         if(waitKey(1) < 0) break;
     }
     return 0;
