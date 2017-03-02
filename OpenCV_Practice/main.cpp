@@ -17,6 +17,8 @@ using namespace std;
 int slider_value, max_slider_value;
 Mat frame, frame_front, frame_front_gray;
 Mat canny_dst, detected_edges;
+VideoCapture front_cam(0);
+VideoCapture video("TenThousandSad.mp4");
 
 int edgeThresh = 1;
 int Ratio = 3;
@@ -26,6 +28,13 @@ void on_trackbar(int, void*){
     
     double alpha = (double)slider_value / 100.0;
     double beta = 1.0 - alpha;
+    
+    video >> frame;
+    front_cam >> frame_front;
+    // resize the frame to fit the monitor
+    resize(frame, frame, Size(frame.cols*0.9, frame.rows*0.9));
+    resize(frame_front, frame_front, Size(frame_front.cols*0.2, frame_front.rows*0.2));
+    
     
     /// Create a matrix of the same type and size as src (for dst)
     canny_dst.create(frame_front.size(), frame_front.type());
@@ -52,8 +61,6 @@ void on_trackbar(int, void*){
 }
 
 int main(){
-    VideoCapture front_cam(0);
-    VideoCapture video("/Users/PinYo/Desktop/Senior_Preject/OpenCV_Project/OpenCV_Practice/OpenCV_Practice/TenThousandSad.mp4");
     
     if(!front_cam.isOpened()){
         cout << "Front camera loading error\n";
@@ -71,15 +78,10 @@ int main(){
     createTrackbar("Ratio: ", "Video Window", &slider_value, max_slider_value, on_trackbar);
     
     for(;;){
-        video >> frame;
-        front_cam >> frame_front;
-        // resize the frame to fit the monitor
-        resize(frame, frame, Size(frame.cols*0.9, frame.rows*0.9));
-        resize(frame_front, frame_front, Size(frame_front.cols*0.2, frame_front.rows*0.2));
         
         on_trackbar(slider_value, 0);
 
-        if(waitKey(1) < 0) break;
+        if(waitKey(10) < 0) break;
     }
     return 0;
 }
